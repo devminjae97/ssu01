@@ -19,7 +19,7 @@ int curMap[31][31] = {0};
 
 int getch(void);							// 엔터없이 입력
 int getMap(void);							// 맵불러오기
-void setMap(char n[12]);					// 맵 출력
+void setMap(int steps, char n[12]);			// 맵 출력
 int onGame(char name[12]);					// 게임 
 void mv(int ch, char name[12]);				// 움직이기
 void display(void);							// 명령어 보기
@@ -137,13 +137,13 @@ int getMap(void){					// map 파일에서 맵 가져오기
 }
 
 
-void setMap(char n[12]){					// 맵 최신화, 출력
+void setMap(int steps, char n[12]){					// 맵 최신화, 출력
 	
 	int i,j;
 	
 	system("clear");
 
-	printf("Hello %s\n\nStage %d\n\n\n", n, lvl);	
+	printf("Hello %s\n\nStage %d %8d Steps\n\n\n", n, lvl, steps);	
 
 	for(i = 0; i < 31; i++){
 		for(j = 0; j < 31; j++){
@@ -223,14 +223,12 @@ void mv(int ch, char name[12]){
 		case '#' :
 		default : break;
 	}
-	if(name[10] != '$')	
-		setMap(name);
 
 	return;
 }
-int onGame(char name[12]){
+int onGame(char name[12]){				
 	
-	int steps;
+	int steps;	
 	int undoArr[2][5];
 
 
@@ -248,7 +246,7 @@ int onGame(char name[12]){
 	//게임 시작
 	isOnGame = 1;
 
-	setMap(name);
+	setMap(steps, name);
 
 
 	do{
@@ -260,14 +258,14 @@ int onGame(char name[12]){
 			case 'h' :
 			case 'j' :
 			case 'k' :
-			case 'l' : steps++; mv(key, name); break; 	//이동
+			case 'l' : steps++; mv(key, name); setMap(steps, name); break; 	//이동
 			case 'u' : break;
 			case 'r' : break;
 			case 'n' : break;
 			case 'e' : break;
 			case 's' : break;
 			case 'f' : break;
-			case 'd' : display(); setMap(name); break;	//명령어
+			case 'd' : display(); setMap(steps, name); break;	//명령어
 			case 't' : break;
 			default : break;
 		}
@@ -281,7 +279,7 @@ void display(void){							// 커맨드 보기
 	int ch = '0';
 	
 	system("clear");
-	
+	printf("\n\n\n");
 	printf("* * * * * * * * * * * * * * * * * * *\n");
 	printf("*              Command              *\n");
 	printf("*                                   *\n");
@@ -295,12 +293,12 @@ void display(void){							// 커맨드 보기
 	printf("* d(display Command)                *\n");
 	printf("* t(top ranking)                    *\n");
 	printf("*                                   *\n");
-	printf("* * * * * * * * * * * * * * * * * * *\n\n\n");
-	printf("press q to quit");
+	printf("* * * * * * * * * * * * * * * * * * *\n\n");
+	printf("          Press 'q' to quit");
 
 	do{
 		ch = getch();
-	}while(ch != 'q' || ch != 'Q');
+	}while(ch != 'q' && ch != 'Q');
 	
 	return;
 }
