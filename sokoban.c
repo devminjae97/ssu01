@@ -32,6 +32,7 @@ void top(int);
 //
 
 
+
 int main(void){
 
 	char player_name[12] = {0};
@@ -48,9 +49,11 @@ int main(void){
 	printf("input name : ");
 	scanf("%10s", player_name);
 
-//	do{
-		onGame(player_name);	
-//	}while(level < 6);
+	do{
+		if(onGame(player_name)!=-1)
+			lvl ++;
+		
+	}while(lvl < 6);
 
 	end :
 
@@ -78,6 +81,7 @@ int getch(void){					// 엔터 없이 입력
 
 	return ch;
 }	
+
 
 int getMap(void){					// map 파일에서 맵 가져오기
 	
@@ -166,6 +170,7 @@ void setMap(int steps, char n[12]){					// 맵 최신화, 출력
 
 }
 
+
 void mv(int ch, char name[12]){
 	
 	static int checkgoldmv;					// 금을 움직여야 하는지 체크하는 변수
@@ -226,17 +231,21 @@ void mv(int ch, char name[12]){
 
 	return;
 }
+
+
 int onGame(char name[12]){				
 	
 	int steps;	
 	int undoArr[2][5];
-
+	
+re :
 
 	//게임 값 초기화
 	for(int i=0; i<2; i++)
 		for(int j=0; j<5; j++)
 			undoArr[i][j] = 0;
-	steps = 0;	
+	if(isOnGame==0)
+		steps = 0;	
 	for(int i = 0; i < 31; i++){
 		for(int j = 0; j < 31; j++){
 			curMap[i][j]=allMap[lvl][i][j];
@@ -260,8 +269,8 @@ int onGame(char name[12]){
 			case 'k' :
 			case 'l' : steps++; mv(key, name); setMap(steps, name); break; 	//이동
 			case 'u' : break;
-			case 'r' : break;
-			case 'n' : break;
+			case 'r' : goto re; break;
+			case 'n' : steps=-1; lvl=0; isOnGame=0; break;
 			case 'e' : break;
 			case 's' : save(steps, name); break;
 			case 'f' : break;
@@ -274,6 +283,7 @@ int onGame(char name[12]){
 	
 	return steps;
 }
+
 
 void display(void){							// 커맨드 보기
 	int ch = '0';
@@ -303,6 +313,7 @@ void display(void){							// 커맨드 보기
 	return;
 }
 
+
 void save(int steps, char name[12]){			// 현재 맵 저장하기. steps 수도 저장
 	
 	FILE *ofp;
@@ -331,6 +342,7 @@ void save(int steps, char name[12]){			// 현재 맵 저장하기. steps 수도 
 	
 	return;
 }
+
 
 //void file(){					// 현재 맵에 저장할 때 먼저 현재 맵을 다 지우고 저장하기!			
 //}
