@@ -179,7 +179,7 @@ void mv(int ch, char name[12]){
 			case 'h' : tmpx--; break;
 			case 'l' : tmpx++; break;
 			case 'j' : tmpy++; break;
-			case 'k' save(reUpload): tmpy--; break;
+			case 'k' : tmpy--; break;
 			default : break;
 		}
 	}	
@@ -309,10 +309,8 @@ void save(int steps, char name[12]){			// 현재 맵 저장하기. steps 수도 
 	
 	ofp = fopen("sokoban", "w");
 	
-	system("clear");	
 	
 	fprintf(ofp, "%d\n%s\n", steps, name);
-	printf("%d\n%s\n", steps, name);
 
 	for(int i=0; i<31; i++)
 		for(int j=0; j<31; j++){
@@ -326,7 +324,6 @@ void save(int steps, char name[12]){			// 현재 맵 저장하기. steps 수도 
 					i++;
 					j=-1;
 				}
-				printf("%c",curMap[i][j]);
 			}
 		}
 
