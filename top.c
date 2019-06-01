@@ -3,11 +3,15 @@
 
 void top(int)
 {
-	FILE *ranking.txt;  //텍스트 파일 그냥 만들면 되는지?
+	FILE *ofp;
+
+	ofp = fopen("ranking.txt","r+");
 
 	int score, level; //level 입력받아야됨 아직은
 	int save_rank[5]; //순위 바뀔 때 기존 순위 임시 저장
 	char new_name, name[5]; //문자 다루는 법?
+
+	
 
 	int rank[5][5];
 
@@ -20,6 +24,4 @@ void top(int)
 			if (i<=3)
 				rank[level-1][i+1] = save_rank[i]; //기존 순위를 한 단계 밑으로 저장
 		}
-	}
-
-	
+	}	
