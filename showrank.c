@@ -1,15 +1,14 @@
 #include <stdio.h>
 
-int main(void)
+int showrank(void)
 {
         FILE *ifp;
 
         ifp = fopen("ranking.txt","r+");
 
-        char a,b,c;
-        int A, B, C;
+        char a;
 
-        fopen("sdn.txt","r+");
+        fopen("ranking.txt","r+");
 
         while ((a = getc(ifp)) != EOF)
                 printf("%c", a);
