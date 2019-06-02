@@ -23,11 +23,11 @@ void setMap(int steps, char n[12]);			// 맵 출력
 int onGame(char name[12]);					// 게임 
 void mv(int ch, char name[12]);				// 움직이기
 void display(void);							// 명령어 보기
-void save(int steps, char name[12]);		// 현재 상태 저장
+void save(int steps);						// 현재 상태 저장
 
 // 해야할것
 void undo(void);
-void load();
+int load(void);
 void top(int);
 //
 
@@ -272,8 +272,8 @@ re :
 			case 'r' : goto re; break;
 			case 'n' : steps=-1; lvl=0; isOnGame=0; break;
 			case 'e' : break;
-			case 's' : save(steps, name); break;
-			case 'f' : break;
+			case 's' : save(steps); break;
+			case 'f' : steps=load(); setMap(steps, name); break;
 			case 'd' : display(); setMap(steps, name); break;	//명령어
 			case 't' : break;
 			default : break;
@@ -314,14 +314,14 @@ void display(void){							// 커맨드 보기
 }
 
 
-void save(int steps, char name[12]){			// 현재 맵 저장하기. steps 수도 저장
+void save(int steps){			// 현재 맵 저장하기. steps 수도 저장
 	
 	FILE *ofp;
 	
 	ofp = fopen("sokoban", "w");
 	
 	
-	fprintf(ofp, "%d\n%s\n", steps, name);
+	fprintf(ofp, "%d\n%d\n", lvl, steps);
 
 	for(int i=0; i<31; i++)
 		for(int j=0; j<31; j++){
@@ -344,8 +344,43 @@ void save(int steps, char name[12]){			// 현재 맵 저장하기. steps 수도 
 }
 
 
-//void file(){					// 현재 맵에 저장할 때 먼저 현재 맵을 다 지우고 저장하기!			
-//}
+int load(void){					// 현재 맵에 저장할 때 먼저 현재 맵을 다 지우고 저장하기!			
+	
+	FILE *ifp;
+	int c=0, i=0, j=0, steps;
+
+	for(int i=0; i<31; i++){
+		for(int j=0; j<31; j++){
+			curMap[i][j] = 0;
+		}
+	}
+
+
+
+	system("clear");
+
+
+
+	// Load savd file
+    if ((ifp = fopen("sokoban","r")) == NULL){
+		system("cat >> eLog <<EOF\nError : There's no save file!\nEOF");
+		fclose(ifp);
+		return 1;
+	}
+	else{
+		fscanf(ifp, "%d\n%d\n%", &lvl, &steps);
+		while((c = getc(ifp)) != EOF){
+			if(c == '\n'){
+				curMap[i++][j] = c;
+				j = 0;
+			}
+			else
+				curMap[i][j++] = c;
+		}
+	}	
+
+	return steps;
+}
 
 
 
