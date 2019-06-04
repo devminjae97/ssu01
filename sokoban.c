@@ -23,12 +23,14 @@ void setMap(int steps, char n[12]);			// 맵 출력
 int onGame(char name[12]);					// 게임 
 void mv(int ch, char name[12]);				// 움직이기
 void display(void);							// 명령어 보기
-void save(int steps);						// 현재 상태 저장
+void save(int steps, char n[12]);	// 이름도 저장!!!!!!!!!					// 현재 상태 저장
+int load(char n[12]);								// 저장 상태 불러오기
+int chckclr(void);
 
 // 해야할것
 void undo(void);
-int load(void);
-void top(int);
+void top(void);
+void ranking(int score, char n[12]);
 //
 
 
@@ -143,7 +145,7 @@ int getMap(void){					// map 파일에서 맵 가져오기
 
 void setMap(int steps, char n[12]){					// 맵 최신화, 출력
 	
-	int i,j;
+	int i,j,chcksafe = 0;
 	
 	system("clear");
 
@@ -155,7 +157,7 @@ void setMap(int steps, char n[12]){					// 맵 최신화, 출력
 				case '@' : putchar('@'); x=j; y=i; break;			// 플레이어 위치
 				case '#' : putchar('#'); break;
 				case '$' : putchar('$'); break;
-				case 'O' : putchar('O'); break;
+				case 'O' : putchar('O'); chcksafe++; break;
 				case '.' : putchar(' '); break;
 				case '\n' : putchar('\n');i++; j = -1; break;
 				default : break;
@@ -164,8 +166,15 @@ void setMap(int steps, char n[12]){					// 맵 최신화, 출력
 		}
 	}
 	
+	
 	printf("\n\n\n(Command) ");
 	
+	if(chcksafe == 0){
+		chcksafe = chckclr();
+		if(chcksafe == 1)
+			isOnGame = 0;
+	}
+
 	return;
 
 }
@@ -259,7 +268,7 @@ re :
 
 
 	do{
-		int key;
+		int key=0;
 		
 		key = getch();
 
@@ -272,10 +281,10 @@ re :
 			case 'r' : goto re; break;
 			case 'n' : steps=-1; lvl=0; isOnGame=0; break;
 			case 'e' : break;
-			case 's' : save(steps); break;
-			case 'f' : steps=load(); setMap(steps, name); break;
+			case 's' : save(steps, name); break;
+			case 'f' : steps=load(name); setMap(steps, name); break;
 			case 'd' : display(); setMap(steps, name); break;	//명령어
-			case 't' : break;
+			case 't' : top(); break;
 			default : break;
 		}
 
@@ -314,14 +323,14 @@ void display(void){							// 커맨드 보기
 }
 
 
-void save(int steps){			// 현재 맵 저장하기. steps 수도 저장
+void save(int steps, char n[12]){			// 현재 맵 저장하기. steps 수도 저장
 	
 	FILE *ofp;
 	
 	ofp = fopen("sokoban", "w");
 	
 	
-	fprintf(ofp, "%d\n%d\n", lvl, steps);
+	fprintf(ofp, "%s\n%d\n%d\n", n, lvl, steps);
 
 	for(int i=0; i<31; i++)
 		for(int j=0; j<31; j++){
@@ -344,7 +353,7 @@ void save(int steps){			// 현재 맵 저장하기. steps 수도 저장
 }
 
 
-int load(void){					// 현재 맵에 저장할 때 먼저 현재 맵을 다 지우고 저장하기!			
+int load(char n[12]){					// 현재 맵에 저장할 때 먼저 현재 맵을 다 지우고 저장하기!			
 	
 	FILE *ifp;
 	int c=0, i=0, j=0, steps;
@@ -368,7 +377,7 @@ int load(void){					// 현재 맵에 저장할 때 먼저 현재 맵을 다 지�
 		return 1;
 	}
 	else{
-		fscanf(ifp, "%d\n%d\n%", &lvl, &steps);
+		fscanf(ifp, "%s\n%d\n%d\n%", n, &lvl, &steps);
 		while((c = getc(ifp)) != EOF){
 			if(c == '\n'){
 				curMap[i++][j] = c;
@@ -378,13 +387,36 @@ int load(void){					// 현재 맵에 저장할 때 먼저 현재 맵을 다 지�
 				curMap[i][j++] = c;
 		}
 	}	
-
 	return steps;
+}
+
+
+void top(void){
+
+	int num = 0;
+
+	printf("t ");
+
+	scanf("%d", &num);
+	
+	// 랭킹 출력
+
+	return;
 }
 
 
 
 
+int chckclr(void){			// 클리어 체크 
+	for(int i=0; i<31; i++){
+		for(int j=0; j<31; j++){
+			if(allMap[lvl][i][j] == 'O' && curMap[i][j] != '$')
+				return 0;
+		}
+	}
+
+	return 1;
+}
 
 
 
