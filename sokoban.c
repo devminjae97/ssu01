@@ -228,7 +228,7 @@ void setMap(int steps, char n[12]){					// 맵 최신화, 출력
 	}
 	
 	
-	printf("\n\n\n(Command) ");
+	printf("\n\n(Command) ");
 	
 	if(chcksafe == 0){
 		chcksafe = chckclr();
