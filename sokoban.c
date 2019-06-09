@@ -5,7 +5,7 @@
 
 
 	/*
-	 *  Sokoban / 19.06.07
+	 *  Sokoban / 19.06.09.
 	 *
 	 *	Who made? Mj Cho, Dn Seo, Gw Lee, Yg Kim.
 	 *
@@ -32,17 +32,15 @@ int load(char n[12]);						// 저장 상태 불러오기
 int chckclr(void);							// 스테이지 클리어 검사
 void getRank(void);							// 랭킹 불러오기
 void top(void);								// 랭킹 출력
-
-// 해야할것
 int undo(int isUndo);						// 되돌리기
 void ranking(int score, char n[12]);		// 점수 비교 및 저장
 void end(void);
-//
 
 
 
 int main(void){
 
+	char get_name[100] = {0};
 	char player_name[12] = {0};
 	
 
@@ -57,7 +55,11 @@ int main(void){
 	printf("Start...\n\n");
 	// Get a name
 	printf("input name : ");
-	scanf("%10s", player_name);
+	scanf("%s", get_name);
+
+	for(int i=0; i<10 || get_name[i] != '\0'; i++)
+		player_name[i] = get_name[i];
+	strcat(player_name, "");
 
 	do{
 		if(onGame(player_name)!=-1)
@@ -72,7 +74,7 @@ int main(void){
 		printf("*                                 *\n");
 		printf("*                                 *\n");
 		printf("*                                 *\n");
-		printf("*        Congraturations!!        *\n");
+		printf("*        Congratulations!!        *\n");
 		printf("*                                 *\n");
 		printf("*   You just clear all stages!!   *\n");
 		printf("*                                 *\n");
@@ -105,7 +107,7 @@ int main(void){
 }
 
 
-void getRank(void){
+void getRank(void){							// ranking파일 읽어오
 
 	int i, j;
 	FILE *ifp;
@@ -263,7 +265,7 @@ void setMap(int steps, char n[12]){					// 맵 최신화, 출력
 }
 
 
-void mv(int ch, char name[12]){
+void mv(int ch, char name[12]){				// 움직이는 함수
 	
 	static int checkgoldmv;					// 금을 움직여야 하는지 체크하는 변수
 	int tmpx = x, tmpy = y;
@@ -328,7 +330,7 @@ void mv(int ch, char name[12]){
 }
 
 
-int onGame(char name[12]){				
+int onGame(char name[12]){							// 스테이지 시작
 	
 	int steps;
 	
@@ -360,20 +362,24 @@ re :
 			case 'h' :
 			case 'j' :
 			case 'k' :
-			case 'l' : steps++; mv(key, name); setMap(steps, name); break; 	//이동
-			case 'u' : 
+			case 'l' : steps++; mv(key, name); setMap(steps, name); break; 		// 이동
+			case 'u' : 															// 되돌리기
 				if(undo(2))
 					steps++;
 				setMap(steps, name);
 				break;
-			case 'r' : goto re; break;
-			case 'n' : steps=-1; lvl=0; isOnGame=0; break;
-			case 'e' : end(); break;
-			case 's' : save(steps, name); break;
-			case 'f' : steps=load(name); setMap(steps, name); break;
-			case 'd' : display(); setMap(steps, name); break;	//명령어
-			case 't' : top(); setMap(steps, name); break;
-			case 'z' : setMap(111111, name); break;
+			case 'r' : goto re; break;											// 현재맵 다시 플레이
+			case 'n' : steps=-1; lvl=0; isOnGame=0; break;						// 처음부터 다시 플레이
+			case 'e' : end(); break;											// 끝내기
+			case 's' : save(steps, name); break;								// 현재 상태 저장(플레이어 이름, 점수, 맵)
+			case 'f' : 															// 저장된 상태 불러오기
+				if(load(name) != 0)
+					steps=load(name);
+			   	setMap(steps, name); 
+				break;
+			case 'd' : display(); setMap(steps, name); break;					// 명령어 보기
+			case 't' : top(); setMap(steps, name); break;						// 순위 보기
+			case 'z' : setMap(111111, name); break;								// 개발자 커맨드 - 강제 클리어
 			default : break;
 		}
 
@@ -414,7 +420,7 @@ void display(void){							// 커맨드 보기
 }
 
 
-void save(int steps, char n[12]){			// 현재 맵 저장하기. steps 수도 저장
+void save(int steps, char n[12]){			// 현재 상태 저장
 	
 	FILE *ofp;
 	
@@ -453,18 +459,22 @@ int load(char n[12]){					// 현재 맵에 저장할 때 먼저 현재 맵을 �
 	system("clear");
 
 
-
-	// Load savd file
+	// check the file
     if ((ifp = fopen("sokoban","r")) == NULL){
 		system("cat >> eLog <<EOF\nError : There's no save file!\nEOF");
 		fclose(ifp);
-		return 1;
+		return 0;
 	}
 	else{
+		// clear the current map
 		for(int i=0; i<31; i++)
 			for(int j=0; j<31; j++)
 				curMap[i][j] = 0;
+		
+		//clear undoArr
+		undo(0);
 
+		// Load savd file
 		fscanf(ifp, "%s\n%d\n%d\n%", n, &lvl, &steps);
 		while((c = getc(ifp)) != EOF){
 			if(c == '\n'){
@@ -479,18 +489,18 @@ int load(char n[12]){					// 현재 맵에 저장할 때 먼저 현재 맵을 �
 }
 
 
-void top(void){
+void top(void){							// 순위를 보여주는 함
 
 	int i, j, num = 0;
 
 	printf("t ");
 
-	num = getchar();
+	scanf("%[^\n]", &num);
 
 	system("clear");
+	getchar();	// dummy input
 
-
-	if(num=='\n'){		// enter
+	if(num=='\0'){		// enter
 	 	printf("\n      *Hall of Fame*     \n");
 		for(i=0; i<5; i++){
 			printf("\n│ [stage %d]              │\n", i+1);
@@ -504,7 +514,6 @@ void top(void){
 		printf("\n│ [stage %d]              │\n", i+1);
 		for(j=0; j<5; j++)
 			printf("│ %d  %-11s %7d │\n",j+1, names[i][j], scores[i][j]);		
-		i = getch();		// dummy input
 	}
 	else
 		return;
@@ -545,33 +554,19 @@ int undo(int isUndo){		// 0:reset, 1:save history, 2:undo
 						history[i][j][k] = 'n';
 			break;
 		case 1 :
-//			system("clear");
 			target++;
-//			printf("%d\n\n\n\n\n",target%5);
 			for(i=0;i<31;i++)
-				for(j=0;j<31;j++){
-					
+				for(j=0;j<31;j++)
 					history[target%5][i][j]=curMap[i][j];
-					
-//					printf("%c",history[target%5][i][j]);
-				}
 			break;
 		case 2 :
-			if(history[target%5][0][0]=='n'){
-//				printf("get in%d\n",target);
+			if(history[target%5][0][0]=='n')
 				return 0;
-			}
 			else{
 				system("clear");
-//				printf("%d / %c\n", target%5, history[target%5][0][0]);
 				for(i=0;i<31;i++)
-					for(j=0;j<31;j++){
+					for(j=0;j<31;j++)
 						curMap[i][j]=history[target%5][i][j];
-//						printf("%c", history[target%5][i][j]);
-
-					}
-//				printf("done?\n");
-//				scanf("%d",&x);
 				history[target%5][0][0] = 'n';
 				
 				target--;
@@ -584,7 +579,7 @@ int undo(int isUndo){		// 0:reset, 1:save history, 2:undo
 }
 
 
-void ranking(int score, char n[12]){
+void ranking(int score, char n[12]){				// 랭킹 저장
 
 	int l, i, j;
 	
@@ -629,7 +624,7 @@ void ranking(int score, char n[12]){
 	return;
 }
 
-void end(void){
+void end(void){										// 끝내기
 	
 	isOnGame = 0;
 	lvl = 99;
