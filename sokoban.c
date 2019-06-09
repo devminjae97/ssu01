@@ -157,12 +157,12 @@ int getMap(void){					// map 파일에서 맵 가져오기
 	// Load maps
     if ((ifp = fopen("map","r")) == NULL){
 		printf("Error : Cannot open the map file!\n");
-		system("cat >> eLog <<EOF\nError : Cannot open the map file!\nEOF");
+		//system("cat >> eLog <<EOF\nError : Cannot open the map file!\nEOF");
 		fclose(ifp);
 		return 1;
 	}
 	else{
-		while((c = getc(ifp)) != EOF){				// '1' = 49, '\n' = 10
+		while((c = getc(ifp)) != EOF){				
 			switch(c){
 				case '\n' :
 					if(j != 0){                     // 스테이지가 바뀌지 않았을 때 
@@ -179,7 +179,7 @@ int getMap(void){					// map 파일에서 맵 가져오기
 					lvls++; i=0; j=0;
 					if(cmp != 0){                   // 금과 금고개수 확인
 						printf("Error : [Stage-%d] The number of $ and O is different!\n", lvls+1);
-						system("cat >> eLog <<EOF\nError : The number of $ and O is different!\nEOF");
+						//system("cat >> eLog <<EOF\nError : The number of $ and O is different!\nEOF");
 						fclose(ifp);
 						return 1;
 					}
@@ -379,7 +379,7 @@ re :
 				break;
 			case 'd' : display(); setMap(steps, name); break;					// 명령어 보기
 			case 't' : top(); setMap(steps, name); break;						// 순위 보기
-			case 'z' : setMap(111111, name); break;								// 개발자 커맨드 - 강제 클리어
+			//case 'z' : setMap(111111, name); break;								// 개발자 커맨드 - 강제 클리어
 			default : break;
 		}
 
@@ -461,7 +461,7 @@ int load(char n[12]){					// 현재 맵에 저장할 때 먼저 현재 맵을 �
 
 	// check the file
     if ((ifp = fopen("sokoban","r")) == NULL){
-		system("cat >> eLog <<EOF\nError : There's no save file!\nEOF");
+		//system("cat >> eLog <<EOF\nError : There's no save file!\nEOF");
 		fclose(ifp);
 		return 0;
 	}
